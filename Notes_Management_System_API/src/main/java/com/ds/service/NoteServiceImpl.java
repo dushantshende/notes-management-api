@@ -2,6 +2,7 @@ package com.ds.service;
 
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +18,22 @@ public class NoteServiceImpl implements NotesService {
 	@Autowired
 	private NotesRepository notesRepository;
 	
+	@Autowired
+	private ModelMapper modelMapper;
+	
 	
 	
 	
 	// addNote method
 	@Override
 	public NotesResponseDto addNote(NotesRequestDto dto) {
-		Notes note=new Notes();
+		/*Notes note=new Notes();
 		note.setTitle(dto.getTitle());
-		note.setContent(dto.getContent());
+		note.setContent(dto.getContent());*/
+		
+		Notes note= modelMapper.map(dto, Notes.class);
+		
+		
 		
 		Notes savedNote= notesRepository.save(note);
 		
@@ -42,14 +50,9 @@ public class NoteServiceImpl implements NotesService {
 	public List<NotesResponseDto> getAllNotes() {		
 		List<Notes> notesList= notesRepository.findAll();
 		
-		return notesList.stream().map(note-> {
-			NotesResponseDto dto=new NotesResponseDto();
-			dto.setId(note.getId());
-			dto.setTitle(note.getTitle());
-			dto.setContent(note.getContent());
-			return dto;
-			
-		}).toList();
+		return notesList.stream()
+				.map(note -> modelMapper.map(note, NotesResponseDto.class))
+				.toList();
 	}
 	
 	//getNoteById
@@ -60,12 +63,7 @@ public class NoteServiceImpl implements NotesService {
 		Notes note= notesRepository.findById(id)
 					.orElseThrow(()-> new ResourceNotFoundException("Note not found with id : "+id));
 		
-		NotesResponseDto dto= new NotesResponseDto();
-		dto.setId(note.getId());
-		dto.setTitle(note.getTitle());
-		dto.setContent(note.getContent());
-		
-		return dto;
+		return modelMapper.map(note,NotesResponseDto.class);
 	}
 
 	
@@ -82,12 +80,9 @@ public class NoteServiceImpl implements NotesService {
 			
 			Notes updateNote= notesRepository.save(existing);
 			
-			NotesResponseDto response=new NotesResponseDto();
-			response.setId(updateNote.getId());
-			response.setContent(updateNote.getContent());
-			response.setTitle(updateNote.getTitle());
 			
-			return response;
+			
+			return modelMapper.map(updateNote, NotesResponseDto.class);
 		}
 		
 		

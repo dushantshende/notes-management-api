@@ -53,9 +53,9 @@ public class NotesController {
 		return noteService.updateNote(id, dto);
 	}
 	@DeleteMapping("/{id}")
-	public void delteNote(@PathVariable Long id) {
+	public String delteNote(@PathVariable Long id) {
 		noteService.deleteNote(id);
-		
+		return "Note deleted successfully";
 	}
 	
 }
